@@ -1,0 +1,35 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: install nginx
+      dnf: name=nginx update_cache=yes
+
+    - name: Copy nginx config files
+      copy:
+        src: "./files/nginx.conf"
+        dest: "/etc/nginx/nginx.conf"
+        mode: 0644
+
+    - name: Creates directory
+      file: 
+        path: "/var/www/abhishek.com"
+        state: directory
+
+    - name: Copy static files
+      copy:
+        src: "./files/static_website/"
+        dest: "/var/www/abhishek.com/"
+        mode: 0644
+
+    - name: Update static nginx config
+      copy: 
+        src: "./files/static_website.conf"
+        dest: "/etc/nginx/conf.d/abhishek.com.conf"
+        mode: 0644
+
+    - name: Enable Nginx
+      service: name=nginx enabled=yes
+      become: yes
